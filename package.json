@@ -16,7 +16,8 @@
     "format:check": "prettier --check .",
     "ts:check": "vue-tsc --noEmit",
     "api:start": "docker-compose up",
-    "api:stop": "docker-compose down"
+    "api:stop": "docker-compose down",
+    "api:reset": "docker-compose exec api npx tsx prisma/seed.ts"
   },
   "dependencies": {
     "naive-ui": "2.43.2",
