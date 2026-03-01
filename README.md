@@ -45,14 +45,16 @@ L'application permet à un utilisateur de :
 Un `docker-compose.yml` est fourni pour démarrer l'API et PostgreSQL en une seule commande.
 
 ```bash
-npm run api:start   # Démarrer l'API et la base de données (logs en direct)
+npm run api:start   # Démarrer l'API et la base de données (arrière-plan)
 npm run api:stop    # Arrêter les services
+npm run api:reset   # Remettre la base de données à zéro (supprime et re-seed)
 ```
 
 Cela démarre :
 
 - **PostgreSQL** sur le port `5432` avec les données de seed (cartes Pokémon + comptes de test)
 - **L'API REST + Socket.io** sur `http://localhost:3001`
+- **Documentation Swagger** sur `http://localhost:3001/api-docs` — également disponible en ligne : [tcg-api-csgd.onrender.com/api-docs](https://tcg-api-csgd.onrender.com/api-docs)
 
 **Comptes de test disponibles après le seed :**
 
@@ -84,7 +86,7 @@ VITE_SOCKET_URL=http://localhost:3001
 
 Ces variables pointent vers le backend Docker local. Ne modifiez pas ces valeurs pour le développement.
 
-> **Déploiement Vercel** : renseignez `VITE_API_BASE_URL` et `VITE_SOCKET_URL` dans les variables d'environnement du projet Vercel (Settings → Environment Variables) avec l'URL du backend hébergé. Le fichier `.env` local n'est jamais déployé.
+> **Déploiement Vercel** : le fichier `.env.production` (déjà commité) contient les variables pointant vers le backend hébergé. Vite le charge automatiquement lors du `vite build`. Aucune configuration supplémentaire n'est nécessaire côté Vercel.
 
 ### 3. Démarrer le serveur de développement
 
@@ -103,8 +105,9 @@ npm run lint         # Linter ESLint
 npm run lint:fix     # ESLint avec correction automatique
 npm run format       # Formater avec Prettier
 npm run format:check # Vérifier le formatage
-npm run api:start    # Démarrer l'API + base de données (logs en direct)
+npm run api:start    # Démarrer l'API + base de données (arrière-plan)
 npm run api:stop     # Arrêter l'API + base de données
+npm run api:reset    # Remettre la base de données à zéro (re-seed)
 ```
 
 ## Ce qui est fourni
@@ -135,55 +138,11 @@ Tous les composants Naive UI (`NButton`, `NForm`, `NInput`, `NGrid`, `NCard`, `N
 
 Le typage est un **prérequis attendu** tout au long du TP. Typez vos props, vos `ref`, et les données reçues de l'API ou des événements Socket.io. Les types de base sont fournis, complétez-les au fur et à mesure.
 
-### Pinia
-
-Les stores se définissent avec `defineStore` et s'utilisent dans les composants avec `useXxxStore()`.
-
 ### useApi
 
 Le composable `useApi()` expose toutes les méthodes HTTP. Le token JWT est injecté automatiquement.
 
-```ts
-const api = useApi()
-
-await api.signIn({ email, password }) // → AuthResponse
-await api.signUp({ email, password, username })
-
-await api.getCards() // → Card[]
-
-await api.getMyDecks() // → Deck[]
-await api.getDeck(id) // → Deck
-await api.createDeck({ name, cards }) // cards : number[] (IDs)
-await api.updateDeck(id, { name, cards })
-await api.deleteDeck(id)
-```
-
 > **Important** : les endpoints decks retournent des `DeckCard` (`{ id, deckId, cardId }`) et non des `Card` directement. Pour afficher les détails d'une carte, chargez `getCards()` séparément et croisez les données par `cardId`.
-
-## Structure à implémenter
-
-```
-src/
-├── store/
-│   ├── auth.ts          # Store d'authentification
-│   └── game.ts          # Store de jeu + Socket.io
-│
-├── pages/
-│   ├── HomePage.vue     # Fournie — à enrichir
-│   ├── auth/
-│   │   ├── LoginPage.vue
-│   │   └── RegisterPage.vue
-│   ├── decks/
-│   │   ├── DeckFormPage.vue
-│   │   └── DeckDetailPage.vue
-│   └── game/
-│       └── GamePage.vue
-│
-└── components/
-    ├── card/            # Composant carte + grille
-    ├── deck/            # Liste des decks
-    └── game/            # Lobby, zones de jeu, actions, modal
-```
 
 ## Conseils généraux
 
@@ -210,50 +169,13 @@ src/
 
 # Comment réaliser ce TP
 
-## 0. Initialisation — à faire une seule fois
-
-### Initialiser les issues
+## Initialiser les issues — à faire une seule fois
 
 1. Allez sur l'onglet **Actions** de votre dépôt GitHub
 2. Sélectionnez le workflow **"Setup repo"**
 3. Cliquez sur **"Run workflow"** puis confirmez
 
-Le workflow crée les **15 issues** du TP (incluant le ticket de setup #0).
-
-### Connecter Vercel
-
-Chaque Pull Request déclenche automatiquement un déploiement de preview sur Vercel et poste l'URL en commentaire. Pour activer ce pipeline, vous devez relier votre dépôt à un projet Vercel.
-
-**1. Créer le projet Vercel**
-
-Importez votre dépôt sur [vercel.com](https://vercel.com) et laissez Vercel détecter le projet Vite automatiquement.
-
-**2. Configurer les variables d'environnement sur Vercel**
-
-Dans les settings du projet Vercel (Settings → Environment Variables), ajoutez :
-
-| Variable            | Valeur                                                  |
-| ------------------- | ------------------------------------------------------- |
-| `VITE_API_BASE_URL` | URL de l'API hébergée (ex: `https://votre-api.com/api`) |
-| `VITE_SOCKET_URL`   | URL du serveur Socket.io (ex: `https://votre-api.com`)  |
-
-**3. Récupérer les identifiants Vercel**
-
-Tout se fait depuis le site Vercel, sans CLI :
-
-- **`VERCEL_TOKEN`** : [vercel.com/account/tokens](https://vercel.com/account/tokens) → **"Create Token"**
-- **`VERCEL_PROJECT_ID`** : Projet Vercel → **Settings → General** → champ **"Project ID"**
-- **`VERCEL_ORG_ID`** : [vercel.com/account](https://vercel.com/account) → **General** → champ **"Account ID"**
-
-**4. Ajouter les secrets GitHub**
-
-Dans votre dépôt GitHub (Settings → Secrets and variables → Actions) :
-
-| Secret              | Valeur                                            |
-| ------------------- | ------------------------------------------------- |
-| `VERCEL_TOKEN`      | Token généré à l'étape précédente                 |
-| `VERCEL_ORG_ID`     | Valeur de `orgId` dans `.vercel/project.json`     |
-| `VERCEL_PROJECT_ID` | Valeur de `projectId` dans `.vercel/project.json` |
+Le workflow crée les **15 issues** du TP.
 
 ## Workflow de travail
 
@@ -297,20 +219,12 @@ Après validation, la PR est mergée dans `main`, l'issue se ferme automatiqueme
 
 ## Barème
 
-| #         | Ticket                                                         | Points |
-| --------- | -------------------------------------------------------------- | ------ |
-| 1         | Store d'authentification + guards + HeaderBar conditionnel     | 1      |
-| 2         | Page de connexion                                              | 1      |
-| 3         | Page d'inscription                                             | 1      |
-| 4         | Composants d'affichage des cartes                              | 1      |
-| 5         | Composant de liste des decks                                   | 1      |
-| 6         | Page de création de deck                                       | 1,5    |
-| 7         | Page de détail et édition d'un deck                            | 1,5    |
-| 8         | Store de jeu et composant lobby                                | 2      |
-| 9         | Complétion du store de jeu                                     | 1      |
-| 10        | Page de jeu et composant de zone                               | 2      |
-| 11        | Composants de jeu — main, barre d'actions, modal fin de partie | 2      |
-| 12        | Barre de recherche                                             | 1      |
-| 13        | Responsive design                                              | 3      |
-| 14        | Aperçu des cartes dans la liste des decks                      | 1      |
-| **Total** |                                                                | **20** |
+| #         | Ticket             | Détail                                                                                   | Points |
+| --------- | ------------------ | ---------------------------------------------------------------------------------------- | ------ |
+| 1         | Authentification   | Store d'authentification + guards + pages connexion et inscription                       | 3      |
+| 2         | Decks              | Composants de carte + liste des decks + création + détail et édition                     | 5      |
+| 3         | Jeu en temps réel  | Store de jeu + lobby + complétion du store + page de jeu + composants main/actions/modal | 7      |
+| 4         | Barre de recherche | Filtrage en temps réel dans le formulaire de deck                                        | 1      |
+| 5         | Responsive design  | Adaptation mobile/tablette/desktop sur l'ensemble de l'application                       | 3      |
+| 6         | Aperçu des cartes  | Miniatures des cartes dans la liste des decks                                            | 1      |
+| **Total** |                    |                                                                                          | **20** |

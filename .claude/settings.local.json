@@ -3,7 +3,8 @@
     "allow": [
       "Bash(cd /Users/vfourny/workspace/iut/template-tcg-spa && npm run lint 2>&1)",
       "Bash(npm run format:check 2>&1 && npm run ts:check 2>&1 && npm run build 2>&1)",
-      "Bash(npm run format 2>&1)"
+      "Bash(npm run format 2>&1)",
+      "Bash(cd /Users/vfourny/workspace/iut/tcg-api-vfourny && docker build -t seyrinian/tcg-api:latest . && docker push seyrinian/tcg-api:latest)"
     ]
   }
 }
