@@ -23,7 +23,22 @@
       size="small"
       >{{ card.type }}</NTag
     >
+    <template v-if="currentHp !== undefined">
+      <NProgress
+        type="line"
+        :percentage="hpPercent"
+        :color="hpColor"
+        rail-color="#eee"
+        :height="6"
+        :show-indicator="false"
+        style="width: 80%"
+      />
+      <NText depth="3" :style="{ fontSize: size === 'sm' ? '0.7rem' : '0.75rem' }">
+        ❤ {{ currentHp }}/{{ card.hp }} · ⚔ {{ card.attack }}
+      </NText>
+    </template>
     <NText
+      v-else
       depth="3"
       :style="{ fontSize: size === 'sm' ? '0.7rem' : '0.75rem' }"
     >
@@ -33,23 +48,34 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
+
 import { useColors } from '../../composables/useColors.js'
 import type { Card } from '../../types/index.js'
 
-const { COLORS, getTypeColor } = useColors()
+const { COLORS, getTypeColor, hpColor: getHpColor } = useColors()
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     card: Card
     size?: 'sm' | 'md'
     selectable?: boolean
     selected?: boolean
     disabled?: boolean
+    currentHp?: number
   }>(),
   { size: 'md', selectable: false, selected: false, disabled: false },
 )
 
 const emit = defineEmits<{ toggle: [] }>()
+
+const hpPercent = computed(() =>
+  props.currentHp !== undefined
+    ? Math.round((props.currentHp / props.card.hp) * 100)
+    : 100,
+)
+
+const hpColor = computed(() => getHpColor(hpPercent.value))
 </script>
 
 <style scoped>
@@ -65,7 +91,7 @@ const emit = defineEmits<{ toggle: [] }>()
 }
 
 .card-img {
-  width: 75%;
+  width: 50%;
   border-radius: 6px;
   display: block;
 }
