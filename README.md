@@ -213,15 +213,29 @@ src/
 
 ## 0. Initialisation — à faire une seule fois
 
-### Créer les issues
+### Créer un Personal Access Token (PAT)
 
-Avant de commencer, générez les issues GitHub correspondant aux tickets du TP :
+Le workflow de setup a besoin d'un PAT pour configurer les branch protection rules (le `GITHUB_TOKEN` par défaut ne dispose pas des droits suffisants).
+
+1. Allez sur [github.com/settings/tokens](https://github.com/settings/tokens) → **"Generate new token (classic)"**
+2. Donnez-lui un nom (ex: `tcg-spa-admin`), une expiration suffisante
+3. Cochez le scope **`repo`** (accès complet au dépôt)
+4. Cliquez **"Generate token"** et copiez la valeur
+
+Ajoutez ensuite ce token comme secret dans votre dépôt :
+
+1. Settings → Secrets and variables → Actions → **"New repository secret"**
+2. Nom : `ADMIN_TOKEN` — Valeur : le token copié
+
+### Initialiser le dépôt
+
+Une fois le secret ajouté, lancez le workflow de setup :
 
 1. Allez sur l'onglet **Actions** de votre dépôt GitHub
 2. Sélectionnez le workflow **"Setup repo"**
 3. Cliquez sur **"Run workflow"** puis confirmez
 
-Le workflow crée les **14 issues** du TP et configure automatiquement les branch protection rules sur `main`.
+Le workflow crée les **14 issues** du TP et configure automatiquement les branch protection rules sur `main` (les checks `build` et `check` devront passer avant tout merge).
 
 ### Connecter Vercel
 
