@@ -1,6 +1,9 @@
 <template>
   <div>
-    <NText depth="3" style="display: block; font-size: 0.8rem; margin: 12px 0 8px">
+    <NText
+      depth="3"
+      style="display: block; font-size: 0.8rem; margin: 12px 0 8px"
+    >
       Main ({{ gameStore.myBoard?.hand?.length ?? 0 }}/5)
       <NText v-if="canPlayCard" type="success" style="margin-left: 8px">
         — cliquez une carte pour la jouer

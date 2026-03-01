@@ -2,9 +2,53 @@ name: Pull Request
 
 on:
   pull_request:
+    branches: [main]
 
 jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for protected file changes
+        run: |
+          CHANGED=$(git diff --name-only origin/main...HEAD)
+
+          # Patterns (regex) des fichiers que les étudiants ne doivent pas modifier
+          PROTECTED=(
+            "^\.github/"                                                              # Workflows et seeds GitHub
+            "^\.husky/"                                                               # Hooks Git
+            "^[^/]+\.(config|json)\.[jt]s$"                                          # Fichiers de config racine
+            "^tsconfig"                                                               # TypeScript configs
+            "^package(-lock)?\.json$"                                                 # Dépendances
+            "^(index\.html|vercel\.json|docker-compose\.yml|README\.md)$"            # Docs et config déploiement
+            "^(\.(gitignore|nvmrc|prettierignore|env\.example))$"                    # Dotfiles racine
+          )
+
+          VIOLATIONS=()
+          while IFS= read -r file; do
+            for pattern in "${PROTECTED[@]}"; do
+              if echo "$file" | grep -qE "$pattern"; then
+                VIOLATIONS+=("$file")
+                break
+              fi
+            done
+          done <<< "$CHANGED"
+
+          if [ ${#VIOLATIONS[@]} -gt 0 ]; then
+            echo "❌ Les fichiers suivants sont protégés et ne peuvent pas être modifiés dans une PR :"
+            for v in "${VIOLATIONS[@]}"; do
+              echo "  - $v"
+            done
+            exit 1
+          fi
+
+          echo "✅ Aucun fichier protégé modifié"
+
   build:
+    needs: check
     uses: vfourny/.github/.github/workflows/build.yml@main
     with:
       node_version: '24'

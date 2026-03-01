@@ -4,7 +4,10 @@
       <NText style="font-size: 2rem; display: block; margin-bottom: 8px">
         {{ isWinner ? '🏆' : '💀' }}
       </NText>
-      <NText strong style="font-size: 1.2rem; display: block; margin-bottom: 8px">
+      <NText
+        strong
+        style="font-size: 1.2rem; display: block; margin-bottom: 8px"
+      >
         {{ isWinner ? 'Victoire !' : 'Défaite !' }}
       </NText>
       <NText depth="3" style="display: block; margin-bottom: 24px">

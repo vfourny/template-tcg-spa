@@ -33,7 +33,10 @@
         :show-indicator="false"
         style="width: 80%"
       />
-      <NText depth="3" :style="{ fontSize: size === 'sm' ? '0.7rem' : '0.75rem' }">
+      <NText
+        depth="3"
+        :style="{ fontSize: size === 'sm' ? '0.7rem' : '0.75rem' }"
+      >
         ❤ {{ currentHp }}/{{ card.hp }} · ⚔ {{ card.attack }}
       </NText>
     </template>

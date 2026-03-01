@@ -29,7 +29,11 @@
       </NText>
 
       <NSpace v-if="gameStore.isMyTurn" :size="8">
-        <NButton size="small" :disabled="!canDraw" @click="gameStore.drawCards()">
+        <NButton
+          size="small"
+          :disabled="!canDraw"
+          @click="gameStore.drawCards()"
+        >
           Piocher
         </NButton>
         <NButton
@@ -62,7 +66,8 @@ const canDraw = computed(
 )
 
 const canAttack = computed(
-  () => !!gameStore.myBoard?.activeCard && !!gameStore.opponentBoard?.activeCard,
+  () =>
+    !!gameStore.myBoard?.activeCard && !!gameStore.opponentBoard?.activeCard,
 )
 </script>
 

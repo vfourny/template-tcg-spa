@@ -1,40 +1,9 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm install 2>&1)",
-      "Bash(npx vite build 2>&1)",
-      "WebFetch(domain:github.com)",
-      "WebFetch(domain:raw.githubusercontent.com)",
-      "WebFetch(domain:api.github.com)",
-      "Bash(chmod +x /Users/vfourny/workspace/iut/template-tcg-spa/.husky/pre-commit /Users/vfourny/workspace/iut/template-tcg-spa/.husky/commit-msg)",
-      "Bash(npm run lint 2>&1 | head -60)",
-      "Bash(npm run lint:fix 2>&1)",
-      "Bash(npm run lint 2>&1)",
-      "Bash(npm run format 2>&1 && npm run build 2>&1 | tail -8)",
-      "Bash(npm run format:check 2>&1)",
-      "Bash(npx prettier --write src/views/LoginView.vue src/views/RegisterView.vue 2>&1)",
-      "Bash(npm run lint && npm run format:check 2>&1)",
-      "Bash(npm install socket.io-client 2>&1 | tail -5)",
-      "Bash(npm run lint:fix && npm run format 2>&1 | tail -10)",
-      "Bash(npm run lint:fix && npm run format 2>&1 | tail -15)",
-      "Bash(npm run lint:fix && npm run format:check 2>&1)",
-      "Bash(npx prettier --write src/components/PokemonCard.vue src/views/DeckFormView.vue src/views/GameView.vue 2>&1 && npm run lint && npm run format:check 2>&1)",
-      "Bash(node -e \"\nconst lock = JSON.parse\\(require\\('fs'\\).readFileSync\\('package-lock.json', 'utf8'\\)\\)\nconst pkgs = ['naive-ui','pinia','socket.io-client','vue','vue-router',\n  '@vfourny/node-toolkit','@vitejs/plugin-vue','commitlint','eslint',\n  'husky','lint-staged','prettier','typescript','vite']\npkgs.forEach\\(p => {\n  const v = lock.packages['node_modules/' + p]?.version\n  console.log\\(p + ': ' + v\\)\n}\\)\n\")",
-      "Bash(gh api repos/vfourny/.github/contents/.github/workflows --jq '.[].name')",
-      "Bash(npx prettier --write src/components/GameLobby.vue && npm run lint && npm run format:check 2>&1)",
-      "Bash(npx prettier --write src/routes/index.ts && npm run lint && npm run format:check 2>&1)",
-      "Bash(cd /Users/vfourny/workspace/iut/template-tcg-spa/src/views && mv HomeView.vue HomePage.vue && mv auth/LoginView.vue auth/LoginPage.vue && mv auth/RegisterView.vue auth/RegisterPage.vue && mv decks/DeckDetailView.vue decks/DeckDetailPage.vue && mv decks/DeckFormView.vue decks/DeckFormPage.vue && mv game/GameView.vue game/GamePage.vue)",
-      "Bash(cd /Users/vfourny/workspace/iut/template-tcg-spa && npm install --save-dev vue-tsc 2>&1 | tail -3)",
-      "Bash(node -e \"const p = require\\('./package.json'\\); console.log\\(p.devDependencies['vue-tsc']\\)\")",
-      "Bash(node -e \"console.log\\(require\\('./node_modules/vue-tsc/package.json'\\).version\\)\")",
-      "Bash(npm run format 2>&1)",
-      "Bash(npm run ts:check 2>&1)",
-      "Bash(npm run build 2>&1)",
-      "Bash(gh repo view --json name,url 2>/dev/null || echo \"No GitHub remote configured\")",
-      "Bash(gh issue list --repo vfourny/template-tcg-spa 2>/dev/null || echo \"Cannot access\")",
-      "Bash(gh issue list --repo vfournyiut/tcg-api-vfourny 2>/dev/null | head -50)",
-      "Bash(gh issue list --repo vfourny/template-tcg-spa --state all 2>&1 | head -20)",
-      "Bash(echo \"=== issues.json ===\" && python3 -c \"\nimport json\nwith open\\('/Users/vfourny/workspace/iut/template-tcg-spa/.github/seeds/issues.json'\\) as f:\n    issues = json.load\\(f\\)\ntotal = sum\\(i['points'] for i in issues\\)\nfor i in issues:\n    print\\(f\\\\\"  {i['title']} [{', '.join\\(i['labels']\\)}] — {i['points']} pts\\\\\"\\)\nprint\\(f'Total : {total} pts / {len\\(issues\\)} issues'\\)\n\")"
+      "Bash(cd /Users/vfourny/workspace/iut/template-tcg-spa && npm run lint 2>&1)",
+      "Bash(npm run format:check 2>&1 && npm run ts:check 2>&1 && npm run build 2>&1)",
+      "Bash(npm run format 2>&1)"
     ]
   }
 }

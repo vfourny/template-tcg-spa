@@ -12,27 +12,57 @@ L'application permet à un utilisateur de :
 - Jouer une partie en temps réel contre un autre joueur
 
 > **L'API doit tourner sur `http://localhost:3001` avant de démarrer le projet.**
+> Utilisez Docker pour démarrer l'API et la base de données (voir section [Lancer le backend](#lancer-le-backend-avec-docker)).
 
 ## Prérequis
 
 ### Node.js (v18 ou supérieur)
 
-| Système | Lien |
-|---------|------|
+| Système                 | Lien                              |
+| ----------------------- | --------------------------------- |
 | Windows / macOS / Linux | [nodejs.org](https://nodejs.org/) |
 
 **Via nvm (recommandé)**
 
-| Système | Lien |
-|---------|------|
-| macOS / Linux | [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) |
-| Windows | [nvm-windows](https://github.com/coreybutler/nvm-windows/releases) |
+| Système       | Lien                                                               |
+| ------------- | ------------------------------------------------------------------ |
+| macOS / Linux | [nvm](https://github.com/nvm-sh/nvm#installing-and-updating)       |
+| Windows       | [nvm-windows](https://github.com/coreybutler/nvm-windows/releases) |
+
+### Docker (pour le backend)
+
+| Système                 | Lien                                                          |
+| ----------------------- | ------------------------------------------------------------- |
+| Windows / macOS / Linux | [docker.com](https://www.docker.com/products/docker-desktop/) |
 
 ### Outils recommandés
 
 - **Éditeur** : [VS Code](https://code.visualstudio.com/) ou [WebStorm](https://www.jetbrains.com/webstorm/)
 - **Extension Vue** : [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) pour VS Code
 - **Extension navigateur** : [Vue DevTools](https://devtools.vuejs.org/)
+
+## Lancer le backend avec Docker
+
+Un `docker-compose.yml` est fourni pour démarrer l'API et PostgreSQL en une seule commande.
+
+```bash
+npm run api:start   # Démarrer l'API et la base de données (logs en direct)
+npm run api:stop    # Arrêter les services
+```
+
+Cela démarre :
+
+- **PostgreSQL** sur le port `5432` avec les données de seed (cartes Pokémon + comptes de test)
+- **L'API REST + Socket.io** sur `http://localhost:3001`
+
+**Comptes de test disponibles après le seed :**
+
+| Utilisateur | Email            | Mot de passe |
+| ----------- | ---------------- | ------------ |
+| red         | red@example.com  | password123  |
+| blue        | blue@example.com | password123  |
+
+> Les données PostgreSQL sont persistées dans un volume Docker (`postgres_data`). Pour repartir de zéro : `docker-compose down -v`.
 
 ## Installation
 
@@ -53,6 +83,10 @@ VITE_API_BASE_URL=http://localhost:3001/api
 VITE_SOCKET_URL=http://localhost:3001
 ```
 
+Ces variables pointent vers le backend Docker local. Ne modifiez pas ces valeurs pour le développement.
+
+> **Déploiement Vercel** : renseignez `VITE_API_BASE_URL` et `VITE_SOCKET_URL` dans les variables d'environnement du projet Vercel (Settings → Environment Variables) avec l'URL du backend hébergé. Le fichier `.env` local n'est jamais déployé.
+
 ### 3. Démarrer le serveur de développement
 
 ```bash
@@ -70,21 +104,23 @@ npm run lint         # Linter ESLint
 npm run lint:fix     # ESLint avec correction automatique
 npm run format       # Formater avec Prettier
 npm run format:check # Vérifier le formatage
+npm run api:start    # Démarrer l'API + base de données (logs en direct)
+npm run api:stop     # Arrêter l'API + base de données
 ```
 
 ## Ce qui est fourni
 
-| Fichier | Description |
-|---------|-------------|
-| `src/main.ts` | Point d'entrée (Vue, Pinia, Naive UI configurés) |
-| `src/App.vue` | Composant racine avec layout global |
-| `src/router.ts` | Router avec les routes définies (guards à implémenter) |
-| `src/types/` | Interfaces de base : `PokemonType`, `Card`, `User`, `AuthResponse`, `Deck`, `DeckCard` — les types du jeu sont à compléter |
-| `src/composables/useApi.ts` | Client HTTP prêt à l'emploi (auth, cards, decks) |
-| `src/composables/useColors.ts` | Utilitaires de couleurs pour les types Pokemon et les HP |
-| `src/composables/useStorage.ts` | Wrapper localStorage |
-| `src/components/layout/HeaderBar.vue` | Barre de navigation (sans logique d'affichage conditionnel) |
-| Page d'accueil | Page vide fournie — à enrichir au fil du TP |
+| Fichier                               | Description                                                                                                                |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| `src/main.ts`                         | Point d'entrée (Vue, Pinia, Naive UI configurés)                                                                           |
+| `src/App.vue`                         | Composant racine avec layout global                                                                                        |
+| `src/router.ts`                       | Router avec les routes définies (guards à implémenter)                                                                     |
+| `src/types/`                          | Interfaces de base : `PokemonType`, `Card`, `User`, `AuthResponse`, `Deck`, `DeckCard` — les types du jeu sont à compléter |
+| `src/composables/useApi.ts`           | Client HTTP prêt à l'emploi (auth, cards, decks)                                                                           |
+| `src/composables/useColors.ts`        | Utilitaires de couleurs pour les types Pokemon et les HP                                                                   |
+| `src/composables/useStorage.ts`       | Wrapper localStorage                                                                                                       |
+| `src/components/layout/HeaderBar.vue` | Barre de navigation (sans logique d'affichage conditionnel)                                                                |
+| Page d'accueil                        | Page vide fournie — à enrichir au fil du TP                                                                                |
 
 ## Rappels techniques
 
@@ -111,14 +147,14 @@ Le composable `useApi()` expose toutes les méthodes HTTP. Le token JWT est inje
 ```ts
 const api = useApi()
 
-await api.signIn({ email, password })       // → AuthResponse
+await api.signIn({ email, password }) // → AuthResponse
 await api.signUp({ email, password, username })
 
-await api.getCards()                        // → Card[]
+await api.getCards() // → Card[]
 
-await api.getMyDecks()                      // → Deck[]
-await api.getDeck(id)                       // → Deck
-await api.createDeck({ name, cards })       // cards : number[] (IDs)
+await api.getMyDecks() // → Deck[]
+await api.getDeck(id) // → Deck
+await api.createDeck({ name, cards }) // cards : number[] (IDs)
 await api.updateDeck(id, { name, cards })
 await api.deleteDeck(id)
 ```
@@ -161,12 +197,129 @@ src/
 
 ## Stack technique
 
-| Outil | Rôle |
-|-------|------|
-| Vue 3 + `<script setup lang="ts">` | Framework UI |
-| Vite | Build tool et dev server |
-| Vue Router 4 | Routing côté client |
-| Pinia | Gestion d'état |
-| Naive UI | Bibliothèque de composants UI |
-| Socket.io-client | Communication temps réel |
-| TypeScript | Typage statique |
+| Outil                              | Rôle                          |
+| ---------------------------------- | ----------------------------- |
+| Vue 3 + `<script setup lang="ts">` | Framework UI                  |
+| Vite                               | Build tool et dev server      |
+| Vue Router 4                       | Routing côté client           |
+| Pinia                              | Gestion d'état                |
+| Naive UI                           | Bibliothèque de composants UI |
+| Socket.io-client                   | Communication temps réel      |
+| TypeScript                         | Typage statique               |
+
+---
+
+# Comment réaliser ce TP
+
+## 0. Initialisation — à faire une seule fois
+
+### Créer les issues
+
+Avant de commencer, générez les issues GitHub correspondant aux tickets du TP :
+
+1. Allez sur l'onglet **Actions** de votre dépôt GitHub
+2. Sélectionnez le workflow **"Seed TP issues"**
+3. Cliquez sur **"Run workflow"** puis confirmez
+
+Le workflow ferme et verrouille les issues existantes, puis crée les **14 issues** du TP.
+
+### Connecter Vercel
+
+Chaque Pull Request déclenche automatiquement un déploiement de preview sur Vercel et poste l'URL en commentaire. Pour activer ce pipeline, vous devez relier votre dépôt à un projet Vercel.
+
+**1. Créer le projet Vercel**
+
+Importez votre dépôt sur [vercel.com](https://vercel.com) et laissez Vercel détecter le projet Vite automatiquement.
+
+**2. Configurer les variables d'environnement sur Vercel**
+
+Dans les settings du projet Vercel (Settings → Environment Variables), ajoutez :
+
+| Variable            | Valeur                                                  |
+| ------------------- | ------------------------------------------------------- |
+| `VITE_API_BASE_URL` | URL de l'API hébergée (ex: `https://votre-api.com/api`) |
+| `VITE_SOCKET_URL`   | URL du serveur Socket.io (ex: `https://votre-api.com`)  |
+
+**3. Récupérer les identifiants Vercel**
+
+```bash
+npm install -g vercel
+vercel login
+vercel link   # Lier le projet local → génère .vercel/project.json
+```
+
+Ouvrez `.vercel/project.json` — vous y trouverez `orgId` et `projectId`.
+
+Pour le token : [vercel.com/account/tokens](https://vercel.com/account/tokens) → créer un token.
+
+**4. Ajouter les secrets GitHub**
+
+Dans votre dépôt GitHub (Settings → Secrets and variables → Actions) :
+
+| Secret              | Valeur                                            |
+| ------------------- | ------------------------------------------------- |
+| `VERCEL_TOKEN`      | Token généré à l'étape précédente                 |
+| `VERCEL_ORG_ID`     | Valeur de `orgId` dans `.vercel/project.json`     |
+| `VERCEL_PROJECT_ID` | Valeur de `projectId` dans `.vercel/project.json` |
+
+> `.vercel/` est gitignored — ne commitez pas ce dossier.
+
+## Workflow de travail
+
+Pour chaque ticket :
+
+### 1. Récupérer l'issue
+
+Les issues GitHub contiennent l'objectif, les conseils et les exigences de chaque ticket.
+
+### 2. Créer une branche
+
+Depuis l'issue GitHub, utilisez le bouton **"Create a branch"** pour créer une branche dédiée :
+
+```bash
+git checkout -b 1-store-authentification
+```
+
+### 3. Développer et commiter
+
+```bash
+git add .
+git commit -m "feat: store d'authentification et guards"
+git push origin 1-store-authentification
+```
+
+### 4. Ouvrir une Pull Request
+
+1. Créez une PR vers `main` depuis votre branche
+2. Liez-la à l'issue avec `Closes #1` dans la description
+3. Le pipeline déploie automatiquement une **preview Vercel** et poste l'URL en commentaire
+
+> ⚠️ **GitHub Classroom** : vérifiez que la PR cible bien **votre dépôt** et non le dépôt template d'origine.
+
+### 5. Demander une review
+
+Assignez **@vfourny** comme reviewer. Le professeur vérifie les exigences du ticket, la qualité du code et le bon fonctionnement de la preview.
+
+### 6. Merge et notation
+
+Après validation, la PR est mergée dans `main`, l'issue se ferme automatiquement et le ticket est noté.
+
+## Barème
+
+| #         | Ticket                                                         | Points |
+| --------- | -------------------------------------------------------------- | ------ |
+| 1         | Store d'authentification + guards + HeaderBar conditionnel     | 1      |
+| 2         | Page de connexion                                              | 1      |
+| 3         | Page d'inscription                                             | 1      |
+| 4         | Composants d'affichage des cartes                              | 1      |
+| 5         | Composant de liste des decks                                   | 1      |
+| 6         | Page de création de deck                                       | 1,5    |
+| 7         | Page de détail et édition d'un deck                            | 1,5    |
+| 8         | Store de jeu et composant lobby                                | 2      |
+| 9         | Complétion du store de jeu                                     | 1      |
+| 10        | Page de jeu et composant de zone                               | 2      |
+| 11        | Composants de jeu — main, barre d'actions, modal fin de partie | 2      |
+| 12        | Barre de recherche                                             | 1      |
+| 13        | Responsive design                                              | 3      |
+| 14        | Aperçu des cartes dans la liste des decks                      | 1      |
+| **Total** |                                                                | **20** |

@@ -9,6 +9,7 @@ jobs:
     permissions:
       issues: write
       contents: read
+      administration: write
 
     steps:
       - name: Checkout repo
@@ -82,3 +83,26 @@ jobs:
             }
 
             console.log(`\n📊 Summary: ${closedCount} closed, ${createdCount} created`);
+
+      - name: Configure branch protection
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            await github.rest.repos.updateBranchProtection({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              branch: 'main',
+              required_status_checks: {
+                strict: false,
+                checks: [
+                  { context: 'check' },
+                  { context: 'build' }
+                ]
+              },
+              enforce_admins: false,
+              required_pull_request_reviews: null,
+              restrictions: null
+            });
+
+            console.log('✅ Branch protection configured on main');
