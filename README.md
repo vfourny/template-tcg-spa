@@ -219,20 +219,12 @@ Après validation, la PR est mergée dans `main`, l'issue se ferme automatiqueme
 
 ## Barème
 
-| #         | Ticket                                                         | Points |
-| --------- | -------------------------------------------------------------- | ------ |
-| 1         | Store d'authentification + guards + HeaderBar conditionnel     | 1      |
-| 2         | Page de connexion                                              | 1      |
-| 3         | Page d'inscription                                             | 1      |
-| 4         | Composants d'affichage des cartes                              | 1      |
-| 5         | Composant de liste des decks                                   | 1      |
-| 6         | Page de création de deck                                       | 1,5    |
-| 7         | Page de détail et édition d'un deck                            | 1,5    |
-| 8         | Store de jeu et composant lobby                                | 2      |
-| 9         | Complétion du store de jeu                                     | 1      |
-| 10        | Page de jeu et composant de zone                               | 2      |
-| 11        | Composants de jeu — main, barre d'actions, modal fin de partie | 2      |
-| 12        | Barre de recherche                                             | 1      |
-| 13        | Responsive design                                              | 3      |
-| 14        | Aperçu des cartes dans la liste des decks                      | 1      |
-| **Total** |                                                                | **20** |
+| #         | Ticket             | Détail                                                                                   | Points |
+| --------- | ------------------ | ---------------------------------------------------------------------------------------- | ------ |
+| 1         | Authentification   | Store d'authentification + guards + pages connexion et inscription                       | 3      |
+| 2         | Decks              | Composants de carte + liste des decks + création + détail et édition                     | 5      |
+| 3         | Jeu en temps réel  | Store de jeu + lobby + complétion du store + page de jeu + composants main/actions/modal | 7      |
+| 4         | Barre de recherche | Filtrage en temps réel dans le formulaire de deck                                        | 1      |
+| 5         | Responsive design  | Adaptation mobile/tablette/desktop sur l'ensemble de l'application                       | 3      |
+| 6         | Aperçu des cartes  | Miniatures des cartes dans la liste des decks                                            | 1      |
+| **Total** |                    |                                                                                          | **20** |
