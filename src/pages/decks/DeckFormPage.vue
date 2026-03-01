@@ -54,20 +54,16 @@ import { onMounted, ref } from 'vue'
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
 import PokemonCardsList from '../../components/card/PokemonCardsList.vue'
-import { useCards } from '../../composables/useCards.js'
 import { ROUTES } from '../../router.js'
+import { useCardStore } from '../../store/card.js'
 import { useDeckStore } from '../../store/deck.js'
 
 const router = useRouter()
 const route = useRoute()
 const deckStore = useDeckStore()
+const cardStore = useCardStore()
 
-const {
-  cards,
-  loading: cardsLoading,
-  error: cardsError,
-  fetchCards,
-} = useCards()
+const { cards, loading: cardsLoading, error: cardsError, fetchCards } = cardStore
 
 const deckName = ref('')
 const selectedIds = ref<number[]>([])

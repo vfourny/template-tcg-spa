@@ -32,14 +32,14 @@ import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 import PokemonCardsList from '../../components/card/PokemonCardsList.vue'
-import { useCards } from '../../composables/useCards.js'
+import { useCardStore } from '../../store/card.js'
 import { useDeckStore } from '../../store/deck.js'
 import type { Card } from '../../types/index.js'
 
 const router = useRouter()
 const route = useRoute()
 const deckStore = useDeckStore()
-const { cards, fetchCards } = useCards()
+const { cards, fetchCards } = useCardStore()
 
 const loading = ref(false)
 const error = ref<string | null>(null)

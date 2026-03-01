@@ -1,12 +1,14 @@
 import type { AuthResponse, Card, Deck } from '../types/index.js'
+import { useStorage } from './useStorage.js'
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
+const storage = useStorage()
 
 const request = async <T>(
   path: string,
   options: RequestInit = {},
 ): Promise<T> => {
-  const token = localStorage.getItem('token')
+  const token = storage.get<string>('token')
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',

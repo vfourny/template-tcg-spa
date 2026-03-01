@@ -2,14 +2,14 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 
 import { useApi } from '../composables/useApi.js'
+import { useStorage } from '../composables/useStorage.js'
 import type { User } from '../types/index.js'
 
 export const useAuthStore = defineStore('auth', () => {
   const api = useApi()
-  const token = ref<string | null>(localStorage.getItem('token'))
-  const user = ref<User | null>(
-    JSON.parse(localStorage.getItem('user') || 'null'),
-  )
+  const storage = useStorage()
+  const token = ref<string | null>(storage.get<string>('token'))
+  const user = ref<User | null>(storage.get<User>('user'))
 
   const isAuthenticated = computed(() => !!token.value)
 
@@ -17,8 +17,8 @@ export const useAuthStore = defineStore('auth', () => {
     const data = await api.signIn({ email, password })
     token.value = data.token
     user.value = data.user
-    localStorage.setItem('token', data.token)
-    localStorage.setItem('user', JSON.stringify(data.user))
+    storage.set('token', data.token)
+    storage.set('user', data.user)
   }
 
   const register = async (
@@ -29,15 +29,14 @@ export const useAuthStore = defineStore('auth', () => {
     const data = await api.signUp({ email, password, username })
     token.value = data.token
     user.value = data.user
-    localStorage.setItem('token', data.token)
-    localStorage.setItem('user', JSON.stringify(data.user))
+    storage.set('token', data.token)
+    storage.set('user', data.user)
   }
 
   const logout = (): void => {
     token.value = null
     user.value = null
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
+    storage.remove('token', 'user')
   }
 
   return { token, user, isAuthenticated, login, register, logout }
