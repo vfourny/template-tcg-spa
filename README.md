@@ -176,34 +176,6 @@ Le composable `useApi()` expose toutes les méthodes HTTP. Le token JWT est inje
 
 Le workflow crée les **15 issues** du TP.
 
-## Connecter Vercel
-
-Chaque Pull Request déclenche automatiquement un déploiement de preview sur Vercel et poste l'URL en commentaire. Pour activer ce pipeline, vous devez relier votre dépôt à un projet Vercel.
-
-**1. Créer le projet Vercel**
-
-Importez votre dépôt sur [vercel.com](https://vercel.com) et laissez Vercel détecter le projet Vite automatiquement.
-
-> Les variables d'environnement de production (`VITE_API_BASE_URL`, `VITE_SOCKET_URL`) sont déjà définies dans `.env.production`. Aucune variable à ajouter dans Vercel.
-
-**2. Récupérer les identifiants Vercel**
-
-Tout se fait depuis le site Vercel, sans CLI :
-
-- **`VERCEL_TOKEN`** : [vercel.com/account/tokens](https://vercel.com/account/tokens) → **"Create Token"**
-- **`VERCEL_PROJECT_ID`** : Projet Vercel → **Settings → General** → champ **"Project ID"**
-- **`VERCEL_ORG_ID`** : [vercel.com/account](https://vercel.com/account) → **General** → champ **"Account ID"**
-
-**3. Ajouter les secrets GitHub**
-
-Dans votre dépôt GitHub (Settings → Secrets and variables → Actions) :
-
-| Secret              | Valeur                            |
-| ------------------- | --------------------------------- |
-| `VERCEL_TOKEN`      | Token généré à l'étape précédente |
-| `VERCEL_ORG_ID`     | Account ID récupéré sur Vercel    |
-| `VERCEL_PROJECT_ID` | Project ID récupéré sur Vercel    |
-
 ## Workflow de travail
 
 Pour chaque ticket :
