@@ -239,15 +239,11 @@ Dans les settings du projet Vercel (Settings → Environment Variables), ajoutez
 
 **3. Récupérer les identifiants Vercel**
 
-```bash
-npm install -g vercel
-vercel login
-vercel link   # Lier le projet local → génère .vercel/project.json
-```
+Tout se fait depuis le site Vercel, sans CLI :
 
-Ouvrez `.vercel/project.json` — vous y trouverez `orgId` et `projectId`.
-
-Pour le token : [vercel.com/account/tokens](https://vercel.com/account/tokens) → créer un token.
+- **`VERCEL_TOKEN`** : [vercel.com/account/tokens](https://vercel.com/account/tokens) → **"Create Token"**
+- **`VERCEL_PROJECT_ID`** : Projet Vercel → **Settings → General** → champ **"Project ID"**
+- **`VERCEL_ORG_ID`** : [vercel.com/account](https://vercel.com/account) → **General** → champ **"Account ID"**
 
 **4. Ajouter les secrets GitHub**
 
@@ -260,24 +256,6 @@ Dans votre dépôt GitHub (Settings → Secrets and variables → Actions) :
 | `VERCEL_PROJECT_ID` | Valeur de `projectId` dans `.vercel/project.json` |
 
 > `.vercel/` est gitignored — ne commitez pas ce dossier.
-
-### Configurer le Ruleset GitHub
-
-Pour que les PRs soient bloquées si les checks échouent, configurez un **Ruleset** sur la branche `main` :
-
-1. **Settings → Rules → Rulesets** → **"New branch ruleset"**
-2. Renseignez :
-   - **Name** : `main`
-   - **Enforcement** : `Active`
-   - **Target branches** : `Default branch`
-3. Dans **Rules**, activez **"Require status checks to pass"** et ajoutez :
-   - `check`
-   - `build`
-4. Cliquez **"Create"**
-
-### Valider avec le ticket #0
-
-Une fois Vercel et le Ruleset configurés, traitez l'issue **"0. Setup du dépôt"** comme un ticket normal : créez une branche, faites une modification dans `src/pages/HomePage.vue` et ouvrez une PR. Vérifiez que les deux checks passent et qu'une preview Vercel est postée en commentaire avant de demander une review.
 
 ## Workflow de travail
 
