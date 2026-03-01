@@ -29,7 +29,11 @@
       "Bash(node -e \"console.log\\(require\\('./node_modules/vue-tsc/package.json'\\).version\\)\")",
       "Bash(npm run format 2>&1)",
       "Bash(npm run ts:check 2>&1)",
-      "Bash(npm run build 2>&1)"
+      "Bash(npm run build 2>&1)",
+      "Bash(gh repo view --json name,url 2>/dev/null || echo \"No GitHub remote configured\")",
+      "Bash(gh issue list --repo vfourny/template-tcg-spa 2>/dev/null || echo \"Cannot access\")",
+      "Bash(gh issue list --repo vfournyiut/tcg-api-vfourny 2>/dev/null | head -50)",
+      "Bash(gh issue list --repo vfourny/template-tcg-spa --state all 2>&1 | head -20)"
     ]
   }
 }
