@@ -1,19 +1,17 @@
-name: Seed TP issues
+name: Setup repo
 
 on:
   workflow_dispatch:
 
 jobs:
-  seed:
+  issues:
     runs-on: ubuntu-latest
     permissions:
       issues: write
       contents: read
-      administration: write
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
       - name: Create issues
         uses: actions/github-script@v7
@@ -22,7 +20,6 @@ jobs:
           script: |
             const fs = require('fs');
 
-            // Charger les issues depuis le fichier JSON
             const issues = JSON.parse(
               fs.readFileSync('.github/seeds/issues.json', 'utf8')
             );
@@ -40,7 +37,6 @@ jobs:
 
             let closedCount = 0;
             for (const issue of existingIssues.data) {
-              // Fermer l'issue si elle est ouverte
               if (issue.state === 'open') {
                 await github.rest.issues.update({
                   owner: context.repo.owner,
@@ -49,8 +45,6 @@ jobs:
                   state: 'closed'
                 });
               }
-
-              // Verrouiller l'issue pour empêcher de nouvelles interactions
               if (!issue.locked) {
                 await github.rest.issues.lock({
                   owner: context.repo.owner,
@@ -59,7 +53,6 @@ jobs:
                   lock_reason: 'resolved'
                 });
               }
-
               console.log(`  🗑️  Closed and locked issue #${issue.number}: "${issue.title}"`);
               closedCount++;
             }
@@ -77,14 +70,19 @@ jobs:
                 body: issueData.body,
                 labels: issueData.labels || []
               });
-
               console.log(`  ✅ Issue created: "${issueData.title}" (#${newIssue.data.number})`);
               createdCount++;
             }
 
             console.log(`\n📊 Summary: ${closedCount} closed, ${createdCount} created`);
 
-      - name: Configure branch protection
+  branch-protection:
+    runs-on: ubuntu-latest
+    permissions:
+      administration: write
+
+    steps:
+      - name: Configure branch protection on main
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

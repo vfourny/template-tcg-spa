@@ -218,10 +218,10 @@ src/
 Avant de commencer, générez les issues GitHub correspondant aux tickets du TP :
 
 1. Allez sur l'onglet **Actions** de votre dépôt GitHub
-2. Sélectionnez le workflow **"Seed TP issues"**
+2. Sélectionnez le workflow **"Setup repo"**
 3. Cliquez sur **"Run workflow"** puis confirmez
 
-Le workflow ferme et verrouille les issues existantes, puis crée les **14 issues** du TP.
+Le workflow crée les **14 issues** du TP et configure automatiquement les branch protection rules sur `main`.
 
 ### Connecter Vercel
 
