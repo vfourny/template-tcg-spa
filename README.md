@@ -16,7 +16,7 @@ L'application permet à un utilisateur de :
 
 ## Prérequis
 
-### Node.js (v18 ou supérieur)
+### Node.js (v24)
 
 | Système                 | Lien                              |
 | ----------------------- | --------------------------------- |
@@ -38,7 +38,6 @@ L'application permet à un utilisateur de :
 ### Outils recommandés
 
 - **Éditeur** : [VS Code](https://code.visualstudio.com/) ou [WebStorm](https://www.jetbrains.com/webstorm/)
-- **Extension Vue** : [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) pour VS Code
 - **Extension navigateur** : [Vue DevTools](https://devtools.vuejs.org/)
 
 ## Lancer le backend avec Docker
@@ -213,29 +212,13 @@ src/
 
 ## 0. Initialisation — à faire une seule fois
 
-### Créer un Personal Access Token (PAT)
-
-Le workflow de setup a besoin d'un PAT pour configurer les branch protection rules (le `GITHUB_TOKEN` par défaut ne dispose pas des droits suffisants).
-
-1. Allez sur [github.com/settings/tokens](https://github.com/settings/tokens) → **"Generate new token (classic)"**
-2. Donnez-lui un nom (ex: `tcg-spa-admin`), une expiration suffisante
-3. Cochez le scope **`repo`** (accès complet au dépôt)
-4. Cliquez **"Generate token"** et copiez la valeur
-
-Ajoutez ensuite ce token comme secret dans votre dépôt :
-
-1. Settings → Secrets and variables → Actions → **"New repository secret"**
-2. Nom : `ADMIN_TOKEN` — Valeur : le token copié
-
-### Initialiser le dépôt
-
-Une fois le secret ajouté, lancez le workflow de setup :
+### Initialiser les issues
 
 1. Allez sur l'onglet **Actions** de votre dépôt GitHub
 2. Sélectionnez le workflow **"Setup repo"**
 3. Cliquez sur **"Run workflow"** puis confirmez
 
-Le workflow crée les **14 issues** du TP et configure automatiquement les branch protection rules sur `main` (les checks `build` et `check` devront passer avant tout merge).
+Le workflow crée les **15 issues** du TP (incluant le ticket de setup #0).
 
 ### Connecter Vercel
 
@@ -277,6 +260,24 @@ Dans votre dépôt GitHub (Settings → Secrets and variables → Actions) :
 | `VERCEL_PROJECT_ID` | Valeur de `projectId` dans `.vercel/project.json` |
 
 > `.vercel/` est gitignored — ne commitez pas ce dossier.
+
+### Configurer le Ruleset GitHub
+
+Pour que les PRs soient bloquées si les checks échouent, configurez un **Ruleset** sur la branche `main` :
+
+1. **Settings → Rules → Rulesets** → **"New branch ruleset"**
+2. Renseignez :
+   - **Name** : `main`
+   - **Enforcement** : `Active`
+   - **Target branches** : `Default branch`
+3. Dans **Rules**, activez **"Require status checks to pass"** et ajoutez :
+   - `check`
+   - `build`
+4. Cliquez **"Create"**
+
+### Valider avec le ticket #0
+
+Une fois Vercel et le Ruleset configurés, traitez l'issue **"0. Setup du dépôt"** comme un ticket normal : créez une branche, faites une modification dans `src/pages/HomePage.vue` et ouvrez une PR. Vérifiez que les deux checks passent et qu'une preview Vercel est postée en commentaire avant de demander une review.
 
 ## Workflow de travail
 
