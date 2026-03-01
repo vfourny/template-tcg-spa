@@ -45,7 +45,7 @@ L'application permet à un utilisateur de :
 Un `docker-compose.yml` est fourni pour démarrer l'API et PostgreSQL en une seule commande.
 
 ```bash
-npm run api:start   # Démarrer l'API et la base de données (logs en direct)
+npm run api:start   # Démarrer l'API et la base de données (arrière-plan)
 npm run api:stop    # Arrêter les services
 npm run api:reset   # Remettre la base de données à zéro (supprime et re-seed)
 ```
@@ -85,7 +85,7 @@ VITE_SOCKET_URL=http://localhost:3001
 
 Ces variables pointent vers le backend Docker local. Ne modifiez pas ces valeurs pour le développement.
 
-> **Déploiement Vercel** : les variables d'environnement de production sont définies dans `vercel.json` (`build.env`). Vite les injecte automatiquement lors du build. Aucune configuration supplémentaire n'est nécessaire côté Vercel.
+> **Déploiement Vercel** : le fichier `.env.production` (déjà commité) contient les variables pointant vers le backend hébergé. Vite le charge automatiquement lors du `vite build`. Aucune configuration supplémentaire n'est nécessaire côté Vercel.
 
 ### 3. Démarrer le serveur de développement
 
@@ -104,8 +104,9 @@ npm run lint         # Linter ESLint
 npm run lint:fix     # ESLint avec correction automatique
 npm run format       # Formater avec Prettier
 npm run format:check # Vérifier le formatage
-npm run api:start    # Démarrer l'API + base de données (logs en direct)
+npm run api:start    # Démarrer l'API + base de données (arrière-plan)
 npm run api:stop     # Arrêter l'API + base de données
+npm run api:reset    # Remettre la base de données à zéro (re-seed)
 ```
 
 ## Ce qui est fourni
@@ -183,7 +184,7 @@ Chaque Pull Request déclenche automatiquement un déploiement de preview sur Ve
 
 Importez votre dépôt sur [vercel.com](https://vercel.com) et laissez Vercel détecter le projet Vite automatiquement.
 
-> Les variables d'environnement de production (`VITE_API_BASE_URL`, `VITE_SOCKET_URL`) sont déjà définies dans `vercel.json`. Aucune variable à ajouter dans Vercel.
+> Les variables d'environnement de production (`VITE_API_BASE_URL`, `VITE_SOCKET_URL`) sont déjà définies dans `.env.production`. Aucune variable à ajouter dans Vercel.
 
 **2. Récupérer les identifiants Vercel**
 

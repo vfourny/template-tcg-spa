@@ -24,7 +24,7 @@ jobs:
             "^tsconfig"                                                               # TypeScript configs
             "^package(-lock)?\.json$"                                                 # Dépendances
             "^(index\.html|vercel\.json|docker-compose\.yml|README\.md)$"            # Docs et config déploiement
-            "^(\.(gitignore|nvmrc|prettierignore|env\.example))$"                    # Dotfiles racine
+            "^(\.(gitignore|nvmrc|prettierignore|env\.example|env\.production))$"       # Dotfiles racine
           )
 
           VIOLATIONS=()
