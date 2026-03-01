@@ -54,6 +54,7 @@ Cela démarre :
 
 - **PostgreSQL** sur le port `5432` avec les données de seed (cartes Pokémon + comptes de test)
 - **L'API REST + Socket.io** sur `http://localhost:3001`
+- **Documentation Swagger** sur `http://localhost:3001/api-docs` — également disponible en ligne : [tcg-api-csgd.onrender.com/api-docs](https://tcg-api-csgd.onrender.com/api-docs)
 
 **Comptes de test disponibles après le seed :**
 
