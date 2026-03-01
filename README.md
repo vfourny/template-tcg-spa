@@ -2,15 +2,20 @@
 
 # TCG SPA — Trading Card Game
 
-Ce projet est une **Single Page Application** Vue 3 pour jouer à un jeu de cartes Pokemon en ligne. Elle se connecte à une API REST et un serveur Socket.io déjà fournis.
+Dans ce TP, vous allez construire une **Single Page Application** Vue 3 pour un jeu de cartes Pokemon en ligne. L'objectif est d'implémenter le frontend complet qui s'appuie sur une API REST et un serveur Socket.io déjà fournis.
 
-Ce README vous guidera à travers l'installation du projet et les fonctionnalités à implémenter. L'énoncé complet est dans [tp.md](./tp.md).
+L'application permet à un utilisateur de :
+
+- Créer un compte et se connecter
+- Gérer des decks de 10 cartes Pokemon
+- Rejoindre un lobby de matchmaking en ligne
+- Jouer une partie en temps réel contre un autre joueur
+
+> **L'API doit tourner sur `http://localhost:3001` avant de démarrer le projet.**
 
 ## Prérequis
 
-Avant de commencer, assurez-vous d'avoir installé :
-
-### Node.js (v18 ou supérieur) et npm
+### Node.js (v18 ou supérieur)
 
 | Système | Lien |
 |---------|------|
@@ -22,15 +27,6 @@ Avant de commencer, assurez-vous d'avoir installé :
 |---------|------|
 | macOS / Linux | [nvm](https://github.com/nvm-sh/nvm#installing-and-updating) |
 | Windows | [nvm-windows](https://github.com/coreybutler/nvm-windows/releases) |
-
-### API TCG (backend)
-
-L'API doit être démarrée séparément avant de lancer la SPA. Elle expose :
-
-- **REST** : `http://localhost:3001/api`
-- **Socket.io** : `http://localhost:3001`
-
-Référez-vous au README de l'API pour le démarrage.
 
 ### Outils recommandés
 
@@ -48,13 +44,9 @@ npm install
 
 ### 2. Configuration de l'environnement
 
-Créez un fichier `.env` à la racine du projet en copiant le fichier `.env.example` :
-
 ```bash
 cp .env.example .env
 ```
-
-Le fichier `.env` contient :
 
 ```env
 VITE_API_BASE_URL=http://localhost:3001/api
@@ -67,7 +59,7 @@ VITE_SOCKET_URL=http://localhost:3001
 npm run dev
 ```
 
-L'application est accessible sur **http://localhost:5173** avec hot-reload automatique.
+L'application est accessible sur **http://localhost:5173**.
 
 ## Commandes disponibles
 
@@ -80,66 +72,92 @@ npm run format       # Formater avec Prettier
 npm run format:check # Vérifier le formatage
 ```
 
-## Structure du projet fourni
+## Ce qui est fourni
 
-Voici ce qui est déjà configuré dans le projet :
+| Fichier | Description |
+|---------|-------------|
+| `src/main.ts` | Point d'entrée (Vue, Pinia, Naive UI configurés) |
+| `src/App.vue` | Composant racine avec layout global |
+| `src/router.ts` | Router avec les routes définies (guards à implémenter) |
+| `src/types/` | Interfaces de base : `PokemonType`, `Card`, `User`, `AuthResponse`, `Deck`, `DeckCard` — les types du jeu sont à compléter |
+| `src/composables/useApi.ts` | Client HTTP prêt à l'emploi (auth, cards, decks) |
+| `src/composables/useColors.ts` | Utilitaires de couleurs pour les types Pokemon et les HP |
+| `src/composables/useStorage.ts` | Wrapper localStorage |
+| `src/components/layout/HeaderBar.vue` | Barre de navigation (sans logique d'affichage conditionnel) |
+| Page d'accueil | Page vide fournie — à enrichir au fil du TP |
 
+## Rappels techniques
+
+### Vue 3 `<script setup lang="ts">`
+
+Tout le code Vue utilisera cette syntaxe. Les composants sont enregistrés automatiquement dès qu'ils sont importés.
+
+### Naive UI
+
+Tous les composants Naive UI (`NButton`, `NForm`, `NInput`, `NGrid`, `NCard`, `NModal`, etc.) sont enregistrés **globalement** — utilisez-les directement dans les templates sans import.
+
+### TypeScript
+
+Le typage est un **prérequis attendu** tout au long du TP. Typez vos props, vos `ref`, et les données reçues de l'API ou des événements Socket.io. Les types de base sont fournis, complétez-les au fur et à mesure.
+
+### Pinia
+
+Les stores se définissent avec `defineStore` et s'utilisent dans les composants avec `useXxxStore()`.
+
+### useApi
+
+Le composable `useApi()` expose toutes les méthodes HTTP. Le token JWT est injecté automatiquement.
+
+```ts
+const api = useApi()
+
+await api.signIn({ email, password })       // → AuthResponse
+await api.signUp({ email, password, username })
+
+await api.getCards()                        // → Card[]
+
+await api.getMyDecks()                      // → Deck[]
+await api.getDeck(id)                       // → Deck
+await api.createDeck({ name, cards })       // cards : number[] (IDs)
+await api.updateDeck(id, { name, cards })
+await api.deleteDeck(id)
 ```
-src/
-├── main.ts                        # Point d'entrée (Vue + Pinia + Naive UI)
-├── App.vue                        # Composant racine
-├── router.ts                      # Router Vue avec routes et guards
-├── vite-env.d.ts                  # Types des variables d'environnement
-│
-├── types/                         # Interfaces TypeScript (fourni)
-│   ├── index.ts
-│   ├── auth.ts                    # User, AuthResponse
-│   ├── card.ts                    # Card, GameCard, DeckCard, PokemonType
-│   ├── deck.ts                    # Deck
-│   └── game.ts                    # GameState, PlayerBoard, Room, GameOver
-│
-├── composables/                   # Logique réutilisable (fourni)
-│   ├── useApi.ts                  # Client HTTP (auth, cards, decks)
-│   ├── useColors.ts               # Couleurs par type Pokemon et HP
-│   └── useStorage.ts             # Wrapper localStorage
-│
-└── components/
-    └── layout/
-        └── HeaderBar.vue          # Barre de navigation (fourni)
-```
 
-## Ce que vous devez implémenter
+> **Important** : les endpoints decks retournent des `DeckCard` (`{ id, deckId, cardId }`) et non des `Card` directement. Pour afficher les détails d'une carte, chargez `getCards()` séparément et croisez les données par `cardId`.
+
+## Structure à implémenter
 
 ```
 src/
 ├── store/
-│   ├── auth.ts                    # Store Pinia authentification
-│   └── game.ts                    # Store Pinia jeu + Socket.io
+│   ├── auth.ts          # Store d'authentification
+│   └── game.ts          # Store de jeu + Socket.io
 │
 ├── pages/
-│   ├── HomePage.vue               # Page d'accueil
+│   ├── HomePage.vue     # Fournie — à enrichir
 │   ├── auth/
 │   │   ├── LoginPage.vue
 │   │   └── RegisterPage.vue
 │   ├── decks/
-│   │   ├── DeckFormPage.vue       # Création et édition
+│   │   ├── DeckFormPage.vue
 │   │   └── DeckDetailPage.vue
 │   └── game/
 │       └── GamePage.vue
 │
 └── components/
-    ├── card/
-    │   ├── PokemonCard.vue        # Affichage d'une carte
-    │   └── PokemonCardsList.vue   # Grille de cartes sélectionnables
-    ├── deck/
-    │   └── DeckList.vue           # Liste des decks de l'utilisateur
-    └── game/
-        ├── GameLobby.vue          # Lobby de matchmaking
-        ├── GameActionBar.vue      # Barre d'actions en jeu
-        ├── GameOverModal.vue      # Modal de fin de partie
-        ├── PlayerHand.vue         # Main du joueur
-        └── PlayerZone.vue         # Zone de jeu d'un joueur
+    ├── card/            # Composant carte + grille
+    ├── deck/            # Liste des decks
+    └── game/            # Lobby, zones de jeu, actions, modal
 ```
+
+## Conseils généraux
+
+- **Avancez dans l'ordre des tickets** : chaque partie s'appuie sur la précédente
+- **Lisez les types fournis** avant d'implémenter — ils décrivent les structures de données attendues
+- **Consultez `useApi`** pour connaître les signatures exactes des méthodes disponibles
+- **Utilisez les Vue DevTools** dans le navigateur pour inspecter l'état des stores en temps réel
+- **Naive UI** couvre la plupart des besoins UI — documentation sur [naiveui.com](https://www.naiveui.com/)
+- La mise en page exacte est libre — l'important est que les fonctionnalités soient présentes et correctes
 
 ## Stack technique
 
