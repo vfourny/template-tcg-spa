@@ -255,8 +255,6 @@ Dans votre dépôt GitHub (Settings → Secrets and variables → Actions) :
 | `VERCEL_ORG_ID`     | Valeur de `orgId` dans `.vercel/project.json`     |
 | `VERCEL_PROJECT_ID` | Valeur de `projectId` dans `.vercel/project.json` |
 
-> `.vercel/` est gitignored — ne commitez pas ce dossier.
-
 ## Workflow de travail
 
 Pour chaque ticket :
