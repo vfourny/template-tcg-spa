@@ -59,17 +59,19 @@ const emit = defineEmits<{ toggle: [] }>()
   align-items: center;
   gap: 4px;
   width: 100%;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 8px 4px;
 }
 
 .card-img {
-  width: 100%;
+  width: 75%;
   border-radius: 6px;
   display: block;
 }
 
 .card.selectable {
   cursor: pointer;
-  border: 3px solid transparent;
 }
 
 .card.selectable:hover:not(.disabled) {

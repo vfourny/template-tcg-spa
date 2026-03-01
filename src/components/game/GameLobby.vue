@@ -87,26 +87,29 @@
 <script setup lang="ts">
 import { computed, onMounted, reactive, ref } from 'vue'
 
+import { useApi } from '../../composables/useApi.js'
 import { useAuthStore } from '../../store/auth.js'
-import { useDeckStore } from '../../store/deck.js'
 import { useGameStore } from '../../store/game.js'
+import type { Deck } from '../../types/index.js'
 
 const gameStore = useGameStore()
 const authStore = useAuthStore()
-const deckStore = useDeckStore()
+const api = useApi()
 
+const decks = ref<Deck[]>([])
 const createDeckId = ref<number | null>(null)
 const joinDeckIds = reactive<Record<number, number | null>>({})
 
 const deckOptions = computed(() =>
-  deckStore.decks.map((d) => ({ label: d.name, value: d.id })),
+  decks.value.map((d) => ({ label: d.name, value: d.id })),
 )
 
-onMounted(() => {
+onMounted(async () => {
   if (!gameStore.isConnected && authStore.token) {
     gameStore.connect(authStore.token)
   }
   gameStore.getRooms()
+  decks.value = await api.getMyDecks()
 })
 
 const handleCreate = (): void => {

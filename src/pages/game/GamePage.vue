@@ -119,22 +119,12 @@
           v-for="(handCard, index) in myBoard?.hand ?? []"
           :key="handCard.id"
         >
-          <div
-            class="hand-card"
-            :class="{ playable: canPlayCard }"
-            @click="canPlayCard && gameStore.playCard(index)"
-          >
-            <img
-              :src="handCard.imgUrl"
-              :alt="handCard.name"
-              style="width: 100%; border-radius: 4px"
-            />
-            <NText
-              style="font-size: 0.65rem; text-align: center; display: block"
-            >
-              {{ handCard.name }}
-            </NText>
-          </div>
+          <PokemonCard
+            :card="handCard"
+            size="sm"
+            :selectable="canPlayCard"
+            @toggle="gameStore.playCard(index)"
+          />
         </NGridItem>
       </NGrid>
 
@@ -155,6 +145,7 @@ import { computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 import ActiveCard from '../../components/card/ActiveCard.vue'
+import PokemonCard from '../../components/card/PokemonCard.vue'
 import { ROUTES } from '../../router.js'
 import { useGameStore } from '../../store/game.js'
 
@@ -218,21 +209,5 @@ const returnToLobby = (): void => {
   border-bottom: 1px solid #eee;
   background: #fff;
   flex-shrink: 0;
-}
-
-.hand-card {
-  cursor: default;
-  border-radius: 6px;
-  border: 2px solid transparent;
-  padding: 2px;
-  transition: border-color 0.15s;
-}
-
-.hand-card.playable {
-  cursor: pointer;
-}
-
-.hand-card.playable:hover {
-  border-color: #18a058;
 }
 </style>

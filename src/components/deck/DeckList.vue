@@ -10,12 +10,12 @@
     <NSpin v-if="loading" />
     <NAlert v-else-if="error" type="error">{{ error }}</NAlert>
     <NEmpty
-      v-else-if="deckStore.decks.length === 0"
+      v-else-if="decks.length === 0"
       description="Aucun deck pour l'instant."
     />
 
     <NGrid v-else cols="1 s:2 l:3" :x-gap="16" :y-gap="16">
-      <NGridItem v-for="deck in deckStore.decks" :key="deck.id">
+      <NGridItem v-for="deck in decks" :key="deck.id">
         <NCard
           :title="deck.name"
           hoverable
@@ -48,11 +48,13 @@
 import { onMounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 
-import { useDeckStore } from '../../store/deck.js'
+import { useApi } from '../../composables/useApi.js'
+import type { Deck } from '../../types/index.js'
 
 const router = useRouter()
-const deckStore = useDeckStore()
+const api = useApi()
 
+const decks = ref<Deck[]>([])
 const loading = ref(false)
 const error = ref<string | null>(null)
 
@@ -60,7 +62,7 @@ onMounted(async () => {
   loading.value = true
   error.value = null
   try {
-    await deckStore.fetchDecks()
+    decks.value = await api.getMyDecks()
   } catch (e) {
     error.value = (e as Error).message
   } finally {
@@ -70,7 +72,8 @@ onMounted(async () => {
 
 const handleDelete = async (id: number): Promise<void> => {
   try {
-    await deckStore.deleteDeck(id)
+    await api.deleteDeck(id)
+    decks.value = decks.value.filter((d) => d.id !== id)
   } catch (e) {
     error.value = (e as Error).message
   }

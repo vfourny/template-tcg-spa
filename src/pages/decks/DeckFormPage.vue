@@ -54,17 +54,17 @@ import { onMounted, ref } from 'vue'
 import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router'
 
 import PokemonCardsList from '../../components/card/PokemonCardsList.vue'
+import { useApi } from '../../composables/useApi.js'
 import { ROUTES } from '../../router.js'
-import { useCardStore } from '../../store/card.js'
-import { useDeckStore } from '../../store/deck.js'
+import type { Card } from '../../types/index.js'
 
 const router = useRouter()
 const route = useRoute()
-const deckStore = useDeckStore()
-const cardStore = useCardStore()
+const api = useApi()
 
-const { cards, loading: cardsLoading, error: cardsError, fetchCards } = cardStore
-
+const cards = ref<Card[]>([])
+const cardsLoading = ref(false)
+const cardsError = ref<string | null>(null)
 const deckName = ref('')
 const selectedIds = ref<number[]>([])
 const submitting = ref(false)
@@ -73,19 +73,23 @@ const error = ref<string | null>(null)
 const loadDeck = async (id: string | string[]): Promise<void> => {
   error.value = null
   try {
-    await deckStore.fetchDeck(id as string)
-    const deck = deckStore.currentDeck
-    if (deck) {
-      deckName.value = deck.name
-      selectedIds.value = deck.cards.map((dc) => dc.cardId)
-    }
+    const deck = await api.getDeck(id as string)
+    deckName.value = deck.name
+    selectedIds.value = deck.cards.map((dc) => dc.cardId)
   } catch (e) {
     error.value = (e as Error).message
   }
 }
 
 onMounted(async () => {
-  await fetchCards()
+  cardsLoading.value = true
+  try {
+    cards.value = await api.getCards()
+  } catch (e) {
+    cardsError.value = (e as Error).message
+  } finally {
+    cardsLoading.value = false
+  }
   if (route.params.id) {
     await loadDeck(route.params.id)
   }
@@ -113,13 +117,12 @@ const handleSubmit = async (): Promise<void> => {
   error.value = null
   try {
     if (route.params.id) {
-      await deckStore.updateDeck(
-        route.params.id as string,
-        deckName.value,
-        selectedIds.value,
-      )
+      await api.updateDeck(route.params.id as string, {
+        name: deckName.value,
+        cards: selectedIds.value,
+      })
     } else {
-      await deckStore.createDeck(deckName.value, selectedIds.value)
+      await api.createDeck({ name: deckName.value, cards: selectedIds.value })
     }
     router.push(ROUTES.HOME)
   } catch (e) {
