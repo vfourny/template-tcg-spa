@@ -1,5 +1,5 @@
 <template>
-  <NGrid cols="6" :x-gap="12" :y-gap="12">
+  <NGrid cols="6" :x-gap="24" :y-gap="12">
     <NGridItem v-for="card in cards" :key="card.id">
       <PokemonCard
         :card="card"

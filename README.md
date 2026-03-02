@@ -40,31 +40,6 @@ L'application permet à un utilisateur de :
 - **Éditeur** : [VS Code](https://code.visualstudio.com/) ou [WebStorm](https://www.jetbrains.com/webstorm/)
 - **Extension navigateur** : [Vue DevTools](https://devtools.vuejs.org/)
 
-## Lancer le backend avec Docker
-
-Un `docker-compose.yml` est fourni pour démarrer l'API et PostgreSQL en une seule commande.
-
-```bash
-npm run api:start   # Démarrer l'API et la base de données (arrière-plan)
-npm run api:stop    # Arrêter les services
-npm run api:reset   # Remettre la base de données à zéro (supprime et re-seed)
-```
-
-Cela démarre :
-
-- **PostgreSQL** sur le port `5432` avec les données de seed (cartes Pokémon + comptes de test)
-- **L'API REST + Socket.io** sur `http://localhost:3001`
-- **Documentation Swagger** sur `http://localhost:3001/api-docs` — également disponible en ligne : [tcg-api-csgd.onrender.com/api-docs](https://tcg-api-csgd.onrender.com/api-docs)
-
-**Comptes de test disponibles après le seed :**
-
-| Utilisateur | Email            | Mot de passe |
-| ----------- | ---------------- | ------------ |
-| red         | red@example.com  | password123  |
-| blue        | blue@example.com | password123  |
-
-> Les données PostgreSQL sont persistées dans un volume Docker (`postgres_data`). Pour repartir de zéro : `docker-compose down -v`.
-
 ## Installation
 
 ### 1. Installer les dépendances
@@ -86,9 +61,34 @@ VITE_SOCKET_URL=http://localhost:3001
 
 Ces variables pointent vers le backend Docker local. Ne modifiez pas ces valeurs pour le développement.
 
-> **Déploiement Vercel** : le fichier `.env.production` (déjà commité) contient les variables pointant vers le backend hébergé. Vite le charge automatiquement lors du `vite build`. Aucune configuration supplémentaire n'est nécessaire côté Vercel.
+> **Déploiement Vercel** : le fichier `.env.production` (déjà commité) contient les variables pointant vers le backend hébergé. Le projet Vercel est créé automatiquement au premier déploiement — seul le secret `VERCEL_TOKEN` est nécessaire (voir issue #0).
 
-### 3. Démarrer le serveur de développement
+### 3. Lancer le backend
+
+Un `docker-compose.yml` est fourni pour démarrer l'API et PostgreSQL en une seule commande :
+
+```bash
+npm run api:start   # Démarrer l'API et la base de données (arrière-plan)
+npm run api:stop    # Arrêter les services
+npm run api:reset   # Remettre la base de données à zéro (re-seed)
+```
+
+Cela démarre :
+
+- **PostgreSQL** sur le port `5432` avec les données de seed (cartes Pokémon + comptes de test)
+- **L'API REST + Socket.io** sur `http://localhost:3001`
+- **Documentation Swagger** sur `http://localhost:3001/api-docs` — également disponible en ligne : [tcg-api-csgd.onrender.com/api-docs](https://tcg-api-csgd.onrender.com/api-docs)
+
+**Comptes de test disponibles après le seed :**
+
+| Utilisateur | Email            | Mot de passe |
+| ----------- | ---------------- | ------------ |
+| red         | red@example.com  | password123  |
+| blue        | blue@example.com | password123  |
+
+> Les données PostgreSQL sont persistées dans un volume Docker (`postgres_data`). Pour repartir de zéro : `docker-compose down -v`.
+
+### 4. Démarrer le serveur de développement
 
 ```bash
 npm run dev
@@ -110,29 +110,15 @@ npm run api:stop     # Arrêter l'API + base de données
 npm run api:reset    # Remettre la base de données à zéro (re-seed)
 ```
 
-## Ce qui est fourni
-
-| Fichier                               | Description                                                                                                                |
-| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `src/main.ts`                         | Point d'entrée (Vue, Pinia, Naive UI configurés)                                                                           |
-| `src/App.vue`                         | Composant racine avec layout global                                                                                        |
-| `src/router.ts`                       | Router avec les routes définies (guards à implémenter)                                                                     |
-| `src/types/`                          | Interfaces de base : `PokemonType`, `Card`, `User`, `AuthResponse`, `Deck`, `DeckCard` — les types du jeu sont à compléter |
-| `src/composables/useApi.ts`           | Client HTTP prêt à l'emploi (auth, cards, decks)                                                                           |
-| `src/composables/useColors.ts`        | Utilitaires de couleurs pour les types Pokemon et les HP                                                                   |
-| `src/composables/useStorage.ts`       | Wrapper localStorage                                                                                                       |
-| `src/components/layout/HeaderBar.vue` | Barre de navigation (sans logique d'affichage conditionnel)                                                                |
-| Page d'accueil                        | Page vide fournie — à enrichir au fil du TP                                                                                |
+                                                       |
 
 ## Rappels techniques
-
-### Vue 3 `<script setup lang="ts">`
-
-Tout le code Vue utilisera cette syntaxe. Les composants sont enregistrés automatiquement dès qu'ils sont importés.
 
 ### Naive UI
 
 Tous les composants Naive UI (`NButton`, `NForm`, `NInput`, `NGrid`, `NCard`, `NModal`, etc.) sont enregistrés **globalement** — utilisez-les directement dans les templates sans import.
+
+> Documentation : [naiveui.com](https://www.naiveui.com/en-US/os-theme/components/button)
 
 ### TypeScript
 
@@ -142,30 +128,7 @@ Le typage est un **prérequis attendu** tout au long du TP. Typez vos props, vos
 
 Le composable `useApi()` expose toutes les méthodes HTTP. Le token JWT est injecté automatiquement.
 
-> **Important** : les endpoints decks retournent des `DeckCard` (`{ id, deckId, cardId }`) et non des `Card` directement. Pour afficher les détails d'une carte, chargez `getCards()` séparément et croisez les données par `cardId`.
-
-## Conseils généraux
-
-- **Avancez dans l'ordre des tickets** : chaque partie s'appuie sur la précédente
-- **Lisez les types fournis** avant d'implémenter — ils décrivent les structures de données attendues
-- **Consultez `useApi`** pour connaître les signatures exactes des méthodes disponibles
-- **Utilisez les Vue DevTools** dans le navigateur pour inspecter l'état des stores en temps réel
-- **Naive UI** couvre la plupart des besoins UI — documentation sur [naiveui.com](https://www.naiveui.com/)
-- La mise en page exacte est libre — l'important est que les fonctionnalités soient présentes et correctes
-
-## Stack technique
-
-| Outil                              | Rôle                          |
-| ---------------------------------- | ----------------------------- |
-| Vue 3 + `<script setup lang="ts">` | Framework UI                  |
-| Vite                               | Build tool et dev server      |
-| Vue Router 4                       | Routing côté client           |
-| Pinia                              | Gestion d'état                |
-| Naive UI                           | Bibliothèque de composants UI |
-| Socket.io-client                   | Communication temps réel      |
-| TypeScript                         | Typage statique               |
-
----
+> **Important** : les endpoints decks retournent des `DeckCard` (`{ id, deckId, cardId }`) et non des `Card` directement. Pour afficher les détails d'une carte, chargez `getCards()` séparément et croisez les données p
 
 # Comment réaliser ce TP
 
@@ -175,7 +138,7 @@ Le composable `useApi()` expose toutes les méthodes HTTP. Le token JWT est inje
 2. Sélectionnez le workflow **"Setup repo"**
 3. Cliquez sur **"Run workflow"** puis confirmez
 
-Le workflow crée les **15 issues** du TP.
+Le workflow crée les **issues** du TP.
 
 ## Workflow de travail
 
@@ -204,8 +167,7 @@ git push origin 1-store-authentification
 ### 4. Ouvrir une Pull Request
 
 1. Créez une PR vers `main` depuis votre branche
-2. Liez-la à l'issue avec `Closes #1` dans la description
-3. Le pipeline déploie automatiquement une **preview Vercel** et poste l'URL en commentaire
+2. Le pipeline déploie automatiquement une **preview Vercel** et poste l'URL en commentaire
 
 > ⚠️ **GitHub Classroom** : vérifiez que la PR cible bien **votre dépôt** et non le dépôt template d'origine.
 

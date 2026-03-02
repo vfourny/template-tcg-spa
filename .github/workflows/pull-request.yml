@@ -5,91 +5,38 @@ on:
     branches: [main]
 
 jobs:
-  check:
+  populate-pr:
     runs-on: ubuntu-latest
+    if: github.event.action == 'opened'
+    permissions:
+      pull-requests: write
+      issues: read
     steps:
-      - uses: actions/checkout@v4
+      - name: Copy issue content to PR body
+        uses: actions/github-script@v7
         with:
-          fetch-depth: 0
+          script: |
+            const branch = context.payload.pull_request.head.ref;
+            const match = branch.match(/^(\d+)-/);
+            if (!match) return;
 
-      - name: Check for protected file changes
-        run: |
-          CHANGED=$(git diff --name-only origin/main...HEAD)
+            const issueNumber = parseInt(match[1]);
+            const issue = await github.rest.issues.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issueNumber
+            });
 
-          # Patterns (regex) des fichiers que les étudiants ne doivent pas modifier
-          PROTECTED=(
-            "^\.github/"                                                              # Workflows et seeds GitHub
-            "^\.husky/"                                                               # Hooks Git
-            "^[^/]+\.(config|json)\.[jt]s$"                                          # Fichiers de config racine
-            "^tsconfig"                                                               # TypeScript configs
-            "^package-lock\.json$"                                                    # Lock file
-            "^(index\.html|vercel\.json|docker-compose\.yml|README\.md)$"            # Docs et config déploiement
-            "^(\.(gitignore|nvmrc|prettierignore|env\.example|env\.production))$"       # Dotfiles racine
-          )
-
-          VIOLATIONS=()
-          while IFS= read -r file; do
-            for pattern in "${PROTECTED[@]}"; do
-              if echo "$file" | grep -qE "$pattern"; then
-                VIOLATIONS+=("$file")
-                break
-              fi
-            done
-          done <<< "$CHANGED"
-
-          if [ ${#VIOLATIONS[@]} -gt 0 ]; then
-            echo "❌ Les fichiers suivants sont protégés et ne peuvent pas être modifiés dans une PR :"
-            for v in "${VIOLATIONS[@]}"; do
-              echo "  - $v"
-            done
-            exit 1
-          fi
-
-          echo "✅ Aucun fichier protégé modifié"
+            await github.rest.pulls.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.payload.pull_request.number,
+              body: `> Contenu de l'issue [#${issueNumber} — ${issue.data.title}](${issue.data.html_url})\n\n${issue.data.body}\n\n---\n\nCloses #${issueNumber}`
+            });
 
   build:
-    needs: check
     uses: vfourny/.github/.github/workflows/build.yml@main
     with:
       node_version: '24'
       is_tested: false
       is_build_upload: false
-
-  preview:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Vercel CLI
-        run: npm install -g vercel
-
-      - name: Pull Vercel project settings
-        run: vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
-      - name: Build
-        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
-      - name: Deploy
-        id: deploy
-        run: echo "url=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
-        env:
-          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-
-      - name: Comment PR
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `✅ Preview déployée : ${{ steps.deploy.outputs.url }}`
-            })
