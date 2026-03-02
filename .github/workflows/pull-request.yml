@@ -40,29 +40,3 @@ jobs:
       node_version: '24'
       is_tested: false
       is_build_upload: false
-
-  preview:
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Install Vercel CLI
-        run: npm install -g vercel
-
-      - name: Deploy to Vercel
-        id: deploy
-        run: echo "url=$(vercel deploy --yes --name=${{ github.event.repository.name }} --token=${{ secrets.VERCEL_TOKEN }})" >> $GITHUB_OUTPUT
-
-      - name: Comment PR
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              issue_number: context.issue.number,
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              body: `✅ Preview déployée : ${{ steps.deploy.outputs.url }}`
-            })
