@@ -86,7 +86,7 @@ VITE_SOCKET_URL=http://localhost:3001
 
 Ces variables pointent vers le backend Docker local. Ne modifiez pas ces valeurs pour le développement.
 
-> **Déploiement Vercel** : le fichier `.env.production` (déjà commité) contient les variables pointant vers le backend hébergé. Vite le charge automatiquement lors du `vite build`. Aucune configuration supplémentaire n'est nécessaire côté Vercel.
+> **Déploiement Vercel** : le fichier `.env.production` (déjà commité) contient les variables pointant vers le backend hébergé. Le projet Vercel est créé automatiquement au premier déploiement — seul le secret `VERCEL_TOKEN` est nécessaire (voir issue #0).
 
 ### 3. Démarrer le serveur de développement
 
