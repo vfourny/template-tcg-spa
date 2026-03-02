@@ -40,6 +40,14 @@ L'application permet à un utilisateur de :
 - **Éditeur** : [VS Code](https://code.visualstudio.com/) ou [WebStorm](https://www.jetbrains.com/webstorm/)
 - **Extension navigateur** : [Vue DevTools](https://devtools.vuejs.org/)
 
+## Initialiser les issues — à faire une seule fois
+
+1. Allez sur l'onglet **Actions** de votre dépôt GitHub
+2. Sélectionnez le workflow **"Setup repo"**
+3. Cliquez sur **"Run workflow"** puis confirmez
+
+Le workflow crée les **issues** du TP.
+
 ## Installation
 
 ### 1. Installer les dépendances
@@ -110,8 +118,6 @@ npm run api:stop     # Arrêter l'API + base de données
 npm run api:reset    # Remettre la base de données à zéro (re-seed)
 ```
 
-                                                       |
-
 ## Rappels techniques
 
 ### Naive UI
@@ -126,19 +132,39 @@ Le typage est un **prérequis attendu** tout au long du TP. Typez vos props, vos
 
 ### useApi
 
-Le composable `useApi()` expose toutes les méthodes HTTP. Le token JWT est injecté automatiquement.
+Le composable `useApi()` expose toutes les méthodes HTTP. Le token JWT est injecté automatiquement dans chaque requête.
 
-> **Important** : les endpoints decks retournent des `DeckCard` (`{ id, deckId, cardId }`) et non des `Card` directement. Pour afficher les détails d'une carte, chargez `getCards()` séparément et croisez les données p
+```ts
+const api = useApi()
+
+// Auth
+api.signIn({ email, password }) // → AuthResponse
+api.signUp({ email, password, username }) // → AuthResponse
+
+// Cartes
+api.getCards() // → Card[]
+
+// Decks
+api.getMyDecks() // → Deck[]
+api.getDeck(id) // → Deck
+api.createDeck({ name, cards }) // cards = tableau de 10 cardId
+api.updateDeck(id, { name, cards })
+api.deleteDeck(id)
+```
+
+Toutes les méthodes retournent une `Promise` — utilisez `await` dans un `try/catch` :
+
+```ts
+const api = useApi()
+
+try {
+  const cards = await api.getCards()
+} catch (e) {
+  console.error((e as Error).message)
+}
+```
 
 # Comment réaliser ce TP
-
-## Initialiser les issues — à faire une seule fois
-
-1. Allez sur l'onglet **Actions** de votre dépôt GitHub
-2. Sélectionnez le workflow **"Setup repo"**
-3. Cliquez sur **"Run workflow"** puis confirmez
-
-Le workflow crée les **issues** du TP.
 
 ## Workflow de travail
 
