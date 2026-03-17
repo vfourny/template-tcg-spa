@@ -12,7 +12,7 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL
 const storage = useStorage()
 
 const request = async <T>(path: string, options: RequestInit = {}) => {
-  const token = storage.get<string>('token')
+  const token = storage.get('token')
 
   const headers: Record<string, string> = {
     'Content-Type': 'application/json',
