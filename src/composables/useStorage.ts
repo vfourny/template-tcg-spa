@@ -1,5 +1,5 @@
 import type { User } from '../types'
- 
+
 /**
  * Clé/valeur des données stockées dans le localStorage.
  * Les clés non définies dans cette interface sont autorisées, mais leur type de valeur par défaut est `string | null`.
@@ -14,7 +14,7 @@ interface Storage {
    */
   user: User
 }
- 
+
 /**
  * Wrapper autour du localStorage pour lire et écrire des données typées.
  */
@@ -37,7 +37,7 @@ export function useStorage() {
       return item as (keyof Storage extends T ? string : Storage[T]) | null
     }
   }
- 
+
   /**
    * Écrit une valeur dans le localStorage (sérialisée en JSON).
    * @example storage.set('token', 'eyJ...')
@@ -50,7 +50,7 @@ export function useStorage() {
   ) => {
     localStorage.setItem(key, JSON.stringify(value))
   }
- 
+
   /**
    * Supprime une ou plusieurs clés du localStorage.
    * @example storage.remove('token', 'user')
@@ -58,6 +58,6 @@ export function useStorage() {
   const remove = (...keys: (keyof Storage | (string & {}))[]) => {
     keys.forEach((key) => localStorage.removeItem(key))
   }
- 
+
   return { get, set, remove }
 }
