@@ -35,8 +35,8 @@ jobs:
             });
 
   build:
-    uses: vfourny/.github/.github/workflows/build.yml@main
+    uses: vfourny/.github/.github/workflows/build.yml@00473c4713636e160d0ab596254857f522d90cf8 # TODO: pin the v3.0.0 release SHA
     with:
       node_version: '24'
-      is_tested: false
+      # No `test` script: the shared workflow skips it (run --if-present)
       is_build_upload: false
